@@ -7,10 +7,15 @@ contract Voluntary_project {
     mapping (address => Attributes) public valid_clients;
     mapping (address => bool) public valid_organizations; // note that here organizations can be other voluntry organizations or banks.
     
+    constructor () public{
+        owner = msg.sender;
+        valid_organizations[msg.sender] = true;
+    }
+    
     struct Age{
        
         uint val;
-        uint ver_result;// not dealt with: 0, approved: 1, rejected: -1
+        uint ver_result;// not dealt with: 0, approved: 1, rejected: -1 //xxxx I think we don't need this
         mapping (uint => address) preferred_verifiers;
         mapping (uint => Verification_res) verification_res;
         uint total_num_of_preferred_verifiers;
@@ -53,6 +58,99 @@ contract Voluntary_project {
         //It simply sends a random value to the oublic key holder who is suposed to store it on this field.  
     }
     
+    //----------getter functions for Age's fields
+    function get_client_age_val(address client) external view returns (uint){
+        
+        return  valid_clients[client].age[client].val;
+    }
+    
+    function get_client_age_num_of_preferred_verifiers(address client) external view returns (uint){
+        
+        return valid_clients[client].age[client].total_num_of_preferred_verifiers;
+    }
+    
+    function get_client_age_total_number_of_verifications(address client) external view returns (uint){
+        
+        return valid_clients[client].age[client].total_number_of_verifications;
+    }
+
+    function get_client_age_preferred_verifier(address client, uint indx) external view returns (address){
+        
+        return valid_clients[client].age[client].preferred_verifiers[indx];
+    }
+    
+    function get_client_age_verification_res(address client, uint indx) external view returns (bool){
+        
+        return valid_clients[client].age[client].verification_res[indx].res;
+    }
+    
+    //----------getter functions for Degree's fields
+    
+    function get_client_degree_type(address client,uint indx) external view returns (string memory){
+        
+        return valid_clients[client].degree[indx].type_;
+    }
+    
+    function get_client_degree_description(address client, uint indx)  external view  returns (string memory){
+        
+        return valid_clients[client].degree[indx].description;
+    }
+    
+    function get_client_degree_num_of_preferred_verifiers(address client, uint indx) external view returns (uint){
+        
+        return valid_clients[client].degree[indx].total_num_of_preferred_verifiers;
+    }
+    
+    function get_client_degree_number_of_verifications(address client, uint indx) external view returns (uint){
+        
+        return valid_clients[client].degree[indx].total_number_of_verifications;
+    }
+    
+    function get_client_degree_preferred_verifier(address client,  uint degree_indx, uint verifier_indx) external view returns (address){
+        
+        return valid_clients[client].degree[degree_indx].preferred_verifiers[verifier_indx];
+    }
+    
+    function get_client_degree_verification_res(address client, uint degree_indx, uint verifier_indx) external view returns (bool){
+        
+        return valid_clients[client].degree[degree_indx].verification_res[verifier_indx].res;
+    }
+    //----------getter functions for License's fields
+    function get_client_license_type(address client,uint indx) external view returns (string memory){
+        
+        return valid_clients[client].license[indx].type_;
+    }
+    
+    function get_client_license_description(address client, uint indx) external view returns (string memory){
+        
+        return valid_clients[client].license[indx].description;
+    }
+    
+    function get_client_license_expiryDate(address client, uint indx) external view returns (string memory){
+        
+        return valid_clients[client].license[indx].Expiry_date;
+    }
+    
+    function get_client_license_num_of_preferred_verifiers(address client, uint indx) external view returns (uint){
+        
+        return valid_clients[client].license[indx].total_num_of_preferred_verifiers;
+    }
+    
+    function get_client_license_number_of_verifications(address client, uint indx) external view returns (uint){
+        
+        return valid_clients[client].license[indx].total_number_of_verifications;
+    }
+    
+    function get_client_license_preferred_verifier(address client,  uint degree_indx, uint verifier_indx) external view returns (address){
+        
+        return valid_clients[client].license[degree_indx].preferred_verifiers[verifier_indx];
+    }
+    
+    function get_client_license_verification_res(address client, uint degree_indx, uint verifier_indx) external view returns (bool){
+        
+        return valid_clients[client].license[degree_indx].verification_res[verifier_indx].res;
+    }
+    //-------------
     struct Verification_res{
         
         address verifier_addr;
@@ -90,7 +188,6 @@ contract Voluntary_project {
         valid_clients[client].age[client].val = 0;
     }
     
-    
     function add_admin(address new_admin) external only_owner{
         
         valid_organizations[new_admin] = true;
@@ -98,7 +195,7 @@ contract Voluntary_project {
     
 //------ Insert Attributes-----------------------------
 
-    function is_valid_validator(address validator) internal returns (bool res){
+    function is_valid_validator(address validator) internal view returns (bool res){
         
         res = false;
         if(valid_validators[validator] == true){
@@ -115,10 +212,19 @@ contract Voluntary_project {
                 valid_clients[msg.sender].age[msg.sender].preferred_verifiers[j] = verifiers[i];
             }
         }
+        // make sure it cannot overwrite its age
+        if(valid_clients[msg.sender].age[msg.sender].val == 0){ 
+            valid_clients[msg.sender].age[msg.sender].val = val_;} // set age's field.
+    }
+    
+    function insert_age_preferred_verifiers(address[] calldata verifiers) external only_valid_client{
         
-        require(valid_clients[msg.sender].age[msg.sender].val == 0); // make sure it cannot overwrite its age
-        valid_clients[msg.sender].age[msg.sender].val = val_; // set age's field.
-        
+        for(uint i=0; i < verifiers.length; i++){ //check if the verifiers it proposes are valid
+            if(is_valid_validator(verifiers[i]) == true){
+                uint j = valid_clients[msg.sender].age[msg.sender].total_num_of_preferred_verifiers++;
+                valid_clients[msg.sender].age[msg.sender].preferred_verifiers[j] = verifiers[i];
+            }
+        }
     }
     
     function insert_degree(string calldata degree_, string calldata description_, address[] calldata verifiers) external only_valid_client{
