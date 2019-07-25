@@ -252,7 +252,7 @@ contract Voluntary_project {
                 counter++;
             }
         }
-        require (counter == verifiers.length);// ensures that  verifiers array contains (1) valid verifiers and (2) no dublication.
+        //require (counter == verifiers.length);// ensures that  verifiers array contains (1) valid verifiers and (2) no dublication.
         // store degree's fields.
         valid_clients[msg.sender].degree[j].type_ = degree_;
         valid_clients[msg.sender].degree[j].description = description_;
@@ -271,7 +271,7 @@ contract Voluntary_project {
                 counter++;
             }
         }
-        require (counter == verifiers.length);// ensures that  verifiers array contains (1) valid verifiers and (2) no dublication.
+       // require (counter == verifiers.length);// ensures that  verifiers array contains (1) valid verifiers and (2) no dublication.
         // store all its attributes.
         valid_clients[msg.sender].license[j].type_ = license_;
         valid_clients[msg.sender].license[j].description = description;
