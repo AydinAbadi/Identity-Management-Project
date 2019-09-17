@@ -218,6 +218,28 @@ contract Voluntary_project {
         _;
     }
     //================ 
+    function find_degree_index(address client, bytes calldata val) external view returns (uint index){
+        
+        uint j = valid_clients[client].total_number_of_degrees;
+        for(uint i = 0;i < j; i++){
+            if(keccak256(valid_clients[client].degree[i].type_) == keccak256(val)){
+                index = i;
+                break;
+            }
+        }
+    }
+    
+    function find_license_index(address client, bytes calldata val) external view returns (uint index){
+        
+        uint j = valid_clients[client].total_number_of_licenses;
+        for(uint i = 0;i < j; i++){
+            if(keccak256(valid_clients[client].license[i].type_) == keccak256(val)){
+                index = i;
+                break;
+            }
+        }
+    }
+    
     function register_validator(address validator) external only_valid_admin{ // registers valid validators in the smart contract.
         
         valid_validators[validator] = true;
@@ -449,4 +471,3 @@ contract Voluntary_project {
     }
     
 }
-
