@@ -521,5 +521,4 @@ contract Voluntary_project {
     function prove_attributes_ownership(bytes calldata val) external{
         valid_clients[msg.sender].proof_of_attributes_ownership = val;
     }
-
 }
